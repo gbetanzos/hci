@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Monitor;
+use App\Models\Tic;
 use Illuminate\Console\Command;
 
 class GetTic extends Command
@@ -41,19 +42,33 @@ class GetTic extends Command
         
         foreach(Monitor::all() as $m){
             #dd($m);
-            if($m->port==80 ||$m->port==443){
-                $ch = curl_init();
-                // set url
-                curl_setopt($ch, CURLOPT_URL, "example.com");
-                //return the transfer as a string
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                // $output contains the output string
-                $output = curl_exec($ch);
-                // close curl resource to free up system resources
-                curl_close($ch);     
-                //print($m->host);
-                print($output);
+            $time_start = microtime(true);
+            if($m->port==443){
+                $url = "https://".$m->host;
+            }else{
+                $url = "http://".$m->host;
             }
+            
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
+            curl_setopt($ch, CURLOPT_NOBODY, true);    // we don't need body
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($ch, CURLOPT_PORT , $m->port);
+            curl_setopt($ch, CURLOPT_TIMEOUT,10);
+            $output = curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            print("==========================================================\n");
+            print("Host: ".$m->host." | Code: $httpcode | Port: ".$m->port."\n");
+            $time_end = microtime(true);
+            $time = $time_end - $time_start;
+            print("Seconds: $time\n");
+            $t=new Tic();
+            $t->status=$httpcode;
+            $t->time=$time;
+            $t->monitor_id=$m->id;
+            $t->save();
+
         }
         return 0;
     }

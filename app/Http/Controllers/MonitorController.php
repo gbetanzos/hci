@@ -39,16 +39,12 @@ class MonitorController extends Controller
         //
         $this->validate(request(),[
 			'host'=>'required',
-			'port'=>'required',
-			'protocol'=>'required',
-            'frequency'=>'required'
+			'port'=>'required'
 			]);
 
     	$m=new Monitor();
         $m->host=request()->host;
         $m->port=request()->port;
-        $m->protocol=request()->protocol;
-        $m->frequency=request()->frequency;
         $m->user_id=Auth::id();
         $m->save();
         

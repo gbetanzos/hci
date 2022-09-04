@@ -15,7 +15,7 @@ class CreateTicsTable extends Migration
     {
         Schema::create('tics', function (Blueprint $table) {
             $table->id();
-            $table->integer('status');
+            $table->integer('status')->default(0);
             $table->float('time',5,2)->default(0);
             $table->integer('monitor_id');
             $table->timestamps();

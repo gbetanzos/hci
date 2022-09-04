@@ -15,10 +15,10 @@ class CreateMonitorsTable extends Migration
     {
         Schema::create('monitors', function (Blueprint $table) {
             $table->id();
-            $table->string('host');
-            $table->integer('port');
-            $table->string('protocol');
-            $table->integer('frequency');
+            $table->string('host')->default("");;
+            $table->integer('port')->default(80);
+            $table->string('protocol')->default("tcp");
+            $table->integer('frequency')->default(1);
             $table->integer('user_id');
             $table->timestamps();
         });
