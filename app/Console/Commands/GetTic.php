@@ -48,18 +48,21 @@ class GetTic extends Command
             }else{
                 $url = "http://".$m->host;
             }
-            
+            $userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0';
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
             curl_setopt($ch, CURLOPT_NOBODY, true);    // we don't need body
             curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
             curl_setopt($ch, CURLOPT_PORT , $m->port);
             curl_setopt($ch, CURLOPT_TIMEOUT,10);
+            curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             $output = curl_exec($ch);
             $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
             print("==========================================================\n");
             print("Host: ".$m->host." | Code: $httpcode | Port: ".$m->port."\n");
+            print("$output\n");
             $time_end = microtime(true);
             $time = $time_end - $time_start;
             print("Seconds: $time\n");

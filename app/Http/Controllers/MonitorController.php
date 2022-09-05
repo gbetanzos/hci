@@ -95,5 +95,9 @@ class MonitorController extends Controller
     public function destroy(Monitor $Monitor)
     {
         //
+        $m=Monitor::find(request()->mid);
+        $m->delete();
+        $msg="Monitor has been deleted";
+        return back()->with('success', $msg);
     }
 }

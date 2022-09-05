@@ -23,3 +23,4 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 Route::post('monitors',[App\Http\Controllers\MonitorController::class, 'store'])->name('monitors.store');
+Route::delete('monitors',[App\Http\Controllers\MonitorController::class, 'destroy'])->name('monitors.destroy');

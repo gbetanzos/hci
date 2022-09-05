@@ -2,15 +2,17 @@
 
 @section('content')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js" integrity="sha512-24XP4a9KVoIinPFUbcnjIjAjtS59PUoxQj3GNVpWc86bCqPuy3YxAcxJrxFCxXe4GHtAumCbO2Ze2bddtuxaRw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 <div class="container">
     <div class="row">
         <div class="col-md-8">
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Add monitor
+                <i data-feather="plus"></i> Add monitor
             </button>
             <p>
-
+            
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -85,18 +87,26 @@
                     @else
                         @foreach($u->monitors->sortByDesc('id') as $m)
                             <div class="card">
-                                <h5 class="card-header">Host: {{$m->host}} - Port: {{$m->port}}</h5>
+                                <div class="card-header">
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i data-feather="bar-chart"></i> Host: {{$m->host}} - Port: {{$m->port}}
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="#" onClick="fMonitorDel({{$m->id}})">
+                                                <i data-feather="trash-2"></i> Delete monitor
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                </div>
                                 <div class="card-body">
                                     <div class="chart-container">
                                         <div class="pie-chart-container">
                                             <canvas id="myChart{{$m->id}}" style="width:100%; height:250px;"></canvas>
                                         </div>
                                     </div>
-                                    {{--
-                                    <h5 class="card-title">Special title treatment</h5>
-                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                                    --}}
                                 </div>
                             </div>
                             <script>
@@ -181,4 +191,19 @@
         </div>
     </div>
 </div>
+<script>
+    feather.replace();
+    function fMonitorDel(id){
+        if (confirm("Are you sure you want to delete this monitor?") == true) {
+            $("#monitor_id").val(id);
+            $("#frmMonitorDestroy").submit();
+        }
+    }
+</script>
+<form method="POST" action="{{route('monitors.destroy')}}" id="frmMonitorDestroy">
+    @method('DELETE')
+    {{csrf_field()}}
+    <input type="hidden" name="mid" id="monitor_id">
+</form>
+
 @endsection
