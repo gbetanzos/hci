@@ -1,6 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+
+</style>
+
+<script>
+var botmanWidget = {
+    frameEndpoint: '/hci/botman/chat',
+    chatServer: '/hci/botman',
+    bubbleAvatarUrl: '{{ env('APP_URL') }}/img/bot.png',
+    aboutText: 'Write Something',
+    introMessage: "✋ Hi!",
+    title:"Mehnitoring bot"
+};
+</script>
+<script src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js'></script>
+
 @if(Session::has('success'))
     <script type="text/javascript">
      swal({
@@ -18,11 +34,28 @@
 <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                <i data-feather="plus"></i> Add monitor
-            </button>
+            <div class="row">
+                <div class="col-sm-10" style="padding:2px;">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <i data-feather="plus"></i> Add monitor
+                    </button>
+                </div>
+                <div class="col-sm-2">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            Data points to show
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        @for ($i = 1; $i < 10; $i++)
+                            <li><a class="dropdown-item" href="{{route('home')}}?n={{ $i*20}}">{{ $i *20}}</a></li>
+                        @endfor
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <p>
             
             <!-- Modal -->
@@ -125,9 +158,17 @@
 
                                     //get the pie chart canvas
                                     <?php
+                                    $n=10;
+                                    if(isset($_GET['n'])){
+                                        $n=(int)$_GET['n'];
+                                        if($n==0){
+                                            $n=10;
+                                        }
+                                    }
+
                                     $data="";
                                     $statuses=[];
-                                    foreach($m->tics as $t){
+                                    foreach($m->tics->take($n) as $t){
                                         if(!in_array($t->status, $statuses)){
                                             array_push($statuses,$t->status);
                                         }
@@ -135,7 +176,7 @@
                                     foreach($statuses as $s){
                                         $data.="{ \n label: '$s',\n data: [";
                                         $flag=0;
-                                        foreach($m->tics as $t){
+                                        foreach($m->tics->take($n) as $t){
                                             if($t->status==$s){
                                                 $flag=1;
                                                 $data.="{x:'".$t->created_at."',y:".$t->time."},";
